@@ -1,0 +1,100 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - link "VP VPVET" [ref=e6] [cursor=pointer]:
+        - /url: /client-dashboard
+        - generic [ref=e8]: VP
+        - generic [ref=e9]: VPVET
+      - generic [ref=e11]:
+        - img [ref=e13]
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: João Silva
+          - paragraph [ref=e18]: joao.silva@email.com
+      - navigation [ref=e19]:
+        - link "Início" [ref=e20] [cursor=pointer]:
+          - /url: /client-dashboard
+          - img [ref=e21]
+          - text: Início
+        - link "Meus Pets" [ref=e24] [cursor=pointer]:
+          - /url: /client-dashboard/pets
+          - img [ref=e25]
+          - text: Meus Pets
+        - link "Consultas" [ref=e27] [cursor=pointer]:
+          - /url: /client-dashboard/consultas
+          - img [ref=e28]
+          - text: Consultas
+        - link "Exames" [ref=e30] [cursor=pointer]:
+          - /url: /client-dashboard/exames
+          - img [ref=e31]
+          - text: Exames
+        - link "Histórico" [ref=e34] [cursor=pointer]:
+          - /url: /client-dashboard/historico
+          - img [ref=e35]
+          - text: Histórico
+        - link "Meus Dados" [ref=e38] [cursor=pointer]:
+          - /url: /client-dashboard/meus-dados
+          - img [ref=e39]
+          - text: Meus Dados
+      - button "Sair" [ref=e43] [cursor=pointer]:
+        - img [ref=e44]
+        - text: Sair
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - button "Abrir menu" [ref=e52] [cursor=pointer]:
+              - generic [ref=e53]: Abrir menu
+              - img [ref=e54]
+            - heading "Exames" [level=1] [ref=e56]
+          - generic [ref=e58]: 1 de 1 exames
+      - main [ref=e59]:
+        - generic [ref=e62]:
+          - heading "Filtrar Exames" [level=2] [ref=e64]
+          - button [ref=e66] [cursor=pointer]:
+            - img [ref=e67]
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - heading "Rex" [level=3] [ref=e75]
+            - generic [ref=e76]: Ultrassonografia Abdominal
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - img [ref=e79]
+              - text: 14/10/2025
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - text: Dr. Saulo Vital Paz
+          - generic [ref=e85]:
+            - heading "Principais Achados" [level=4] [ref=e86]
+            - paragraph [ref=e87]: Fígado e rins com aparência normal. Vesícula biliar sem alterações significativas.
+          - generic [ref=e88]:
+            - heading "Impressão Diagnóstica" [level=4] [ref=e89]
+            - paragraph [ref=e90]: Sem evidências de alterações patológicas significativas.
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e96]: "ID: exam-123"
+            - generic [ref=e97]:
+              - button "Ver Detalhes" [ref=e98] [cursor=pointer]:
+                - img [ref=e99]
+                - text: Ver Detalhes
+              - link "Baixar PDF" [ref=e102] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e103]
+                - text: Baixar PDF
+        - generic [ref=e106]:
+          - heading "Sobre seus exames" [level=3] [ref=e107]
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - heading "📋 Acesso Rápido" [level=4] [ref=e110]
+              - paragraph [ref=e111]: Todos os exames ficam disponíveis por 90 dias após a realização.
+            - generic [ref=e112]:
+              - heading "📥 Downloads" [level=4] [ref=e113]
+              - paragraph [ref=e114]: Baixe os laudos completos em PDF para guardar ou compartilhar com outros veterinários.
+            - generic [ref=e115]:
+              - heading "🔒 Privacidade" [level=4] [ref=e116]
+              - paragraph [ref=e117]: Seus resultados são confidenciais e acessíveis apenas com suas credenciais.
+  - alert [ref=e118]
+```
