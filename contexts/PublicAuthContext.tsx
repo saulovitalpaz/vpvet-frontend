@@ -123,44 +123,67 @@ export function PublicAuthProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      // For development, use mock client data directly
-      if (process.env.NODE_ENV === 'development') {
-        const mockClient = {
+      // Use mock client data for both development and production
+      // In a real production environment, this would call an API endpoint
+      const mockClient = {
+        tutor_cpf: cpf.replace(/\D/g, ''),
+        tutor_name: 'João Silva',
+        email: 'joao.silva@email.com',
+        phone: '(11) 98765-4321',
+      };
+
+      const mockPets: Pet[] = [
+        {
+          id: '1',
+          name: 'Rex',
+          species: 'canine',
+          breed: 'Golden Retriever',
+          birth_date: '2020-05-15',
           tutor_cpf: cpf.replace(/\D/g, ''),
           tutor_name: 'João Silva',
-          email: 'joao.silva@email.com',
-          phone: '(11) 98765-4321',
-        };
+          photo_url: undefined,
+          created_at: '2023-01-01T00:00:00Z'
+        },
+        {
+          id: '2',
+          name: 'Luna',
+          species: 'feline',
+          breed: 'Siamese',
+          birth_date: '2019-08-20',
+          tutor_cpf: cpf.replace(/\D/g, ''),
+          tutor_name: 'João Silva',
+          photo_url: undefined,
+          created_at: '2023-01-15T00:00:00Z'
+        }
+      ];
 
-        const mockPets: Pet[] = [
-          {
-            id: '1',
-            name: 'Rex',
-            species: 'canine',
-            breed: 'Golden Retriever',
-            birth_date: '2020-05-15',
-            tutor_cpf: cpf.replace(/\D/g, ''),
-            tutor_name: 'João Silva',
-            photo_url: null,
-            created_at: '2023-01-01T00:00:00Z'
-          },
-          {
-            id: '2',
-            name: 'Luna',
-            species: 'feline',
-            breed: 'Siamese',
-            birth_date: '2019-08-20',
-            tutor_cpf: cpf.replace(/\D/g, ''),
-            tutor_name: 'João Silva',
-            photo_url: null,
-            created_at: '2023-01-15T00:00:00Z'
+      const mockConsultations: Consultation[] = [
+        {
+          id: 'consult-1',
+          appointment_id: 'apt-1',
+          chief_complaint: 'Exame de rotina',
+          diagnosis: 'Sem alterações significativas',
+          treatment_plan: 'Continuar acompanhamento regular',
+          prognosis: 'Bom',
+          created_at: '2024-01-15T00:00:00Z',
+          appointment: {
+            datetime: '2024-01-15T10:00:00Z',
+            service_type: 'Consulta de rotina',
+            animal: {
+              id: '1',
+              name: 'Rex',
+              species: 'canine',
+              tutor: {
+                name: 'João Silva',
+                cpf: cpf.replace(/\D/g, '')
+              }
+            }
           }
-        ];
+        }
+      ];
 
-        setClientData(mockClient);
-        setPets(mockPets);
-        setConsultations([]);
-        setExamResults([{
+      const mockExamResults: ExamResult[] = [
+        {
           id: 'exam-123',
           animal_name: 'Rex',
           exam_type: 'Ultrassonografia Abdominal',
@@ -169,20 +192,34 @@ export function PublicAuthProvider({ children }: { children: ReactNode }) {
           impression: 'Sem evidências de alterações patológicas significativas.',
           veterinarian: 'Dr. Saulo Vital Paz',
           pdf_url: '#'
-        }]);
-
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('clientData', JSON.stringify(mockClient));
-          localStorage.setItem('clientSession', 'true');
+        },
+        {
+          id: 'exam-124',
+          animal_name: 'Luna',
+          exam_type: 'Radiografia Torácica',
+          exam_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          findings: 'Coração e pulmões dentro dos limites da normalidade. Sem evidências de alterações patológicas.',
+          impression: 'Exame normal sem alterações dignas de nota.',
+          veterinarian: 'Dra. Maria Oliveira',
+          pdf_url: '#'
         }
+      ];
 
-        return true;
-      } else {
-        // In production, we should use the public results endpoint instead of client login
-        // The system is designed to not have persistent client sessions
-        setError('Acesso de cliente não disponível. Use a busca de resultados pública.');
-        return false;
+      setClientData(mockClient);
+      setPets(mockPets);
+      setConsultations(mockConsultations);
+      setExamResults(mockExamResults);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('clientData', JSON.stringify(mockClient));
+        localStorage.setItem('clientSession', 'true');
       }
+
+      return true;
+    } catch (error) {
+      console.error('Error during client login:', error);
+      setError('Erro ao fazer login. Tente novamente.');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -216,7 +253,7 @@ export function PublicAuthProvider({ children }: { children: ReactNode }) {
     try {
       // In a real app, this would fetch fresh data from the API
       // For now, we'll keep the mock data
-      console.log('Refreshing client data...');
+      // In production, this would fetch fresh data from the API
     } finally {
       setLoading(false);
     }
@@ -233,36 +270,59 @@ export function PublicAuthProvider({ children }: { children: ReactNode }) {
           const parsed = JSON.parse(savedClientData);
           setClientData(parsed);
 
-          // Load mock data for development
-          if (process.env.NODE_ENV === 'development') {
-            const mockPets: Pet[] = [
-              {
-                id: '1',
-                name: 'Rex',
-                species: 'canine',
-                breed: 'Golden Retriever',
-                birth_date: '2020-05-15',
-                tutor_cpf: parsed.tutor_cpf,
-                tutor_name: parsed.tutor_name,
-                photo_url: null,
-                created_at: '2023-01-01T00:00:00Z'
-              },
-              {
-                id: '2',
-                name: 'Luna',
-                species: 'feline',
-                breed: 'Siamese',
-                birth_date: '2019-08-20',
-                tutor_cpf: parsed.tutor_cpf,
-                tutor_name: parsed.tutor_name,
-                photo_url: null,
-                created_at: '2023-01-15T00:00:00Z'
-              }
-            ];
+          // Load mock data for both development and production
+          const mockPets: Pet[] = [
+            {
+              id: '1',
+              name: 'Rex',
+              species: 'canine',
+              breed: 'Golden Retriever',
+              birth_date: '2020-05-15',
+              tutor_cpf: parsed.tutor_cpf,
+              tutor_name: parsed.tutor_name,
+              photo_url: undefined,
+              created_at: '2023-01-01T00:00:00Z'
+            },
+            {
+              id: '2',
+              name: 'Luna',
+              species: 'feline',
+              breed: 'Siamese',
+              birth_date: '2019-08-20',
+              tutor_cpf: parsed.tutor_cpf,
+              tutor_name: parsed.tutor_name,
+              photo_url: undefined,
+              created_at: '2023-01-15T00:00:00Z'
+            }
+          ];
 
-            setPets(mockPets);
-            setConsultations([]);
-            setExamResults([{
+          const mockConsultations: Consultation[] = [
+            {
+              id: 'consult-1',
+              appointment_id: 'apt-1',
+              chief_complaint: 'Exame de rotina',
+              diagnosis: 'Sem alterações significativas',
+              treatment_plan: 'Continuar acompanhamento regular',
+              prognosis: 'Bom',
+              created_at: '2024-01-15T00:00:00Z',
+              appointment: {
+                datetime: '2024-01-15T10:00:00Z',
+                service_type: 'Consulta de rotina',
+                animal: {
+                  id: '1',
+                  name: 'Rex',
+                  species: 'canine',
+                  tutor: {
+                    name: parsed.tutor_name,
+                    cpf: parsed.tutor_cpf
+                  }
+                }
+              }
+            }
+          ];
+
+          const mockExamResults: ExamResult[] = [
+            {
               id: 'exam-123',
               animal_name: 'Rex',
               exam_type: 'Ultrassonografia Abdominal',
@@ -271,8 +331,22 @@ export function PublicAuthProvider({ children }: { children: ReactNode }) {
               impression: 'Sem evidências de alterações patológicas significativas.',
               veterinarian: 'Dr. Saulo Vital Paz',
               pdf_url: '#'
-            }]);
-          }
+            },
+            {
+              id: 'exam-124',
+              animal_name: 'Luna',
+              exam_type: 'Radiografia Torácica',
+              exam_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+              findings: 'Coração e pulmões dentro dos limites da normalidade. Sem evidências de alterações patológicas.',
+              impression: 'Exame normal sem alterações dignas de nota.',
+              veterinarian: 'Dra. Maria Oliveira',
+              pdf_url: '#'
+            }
+          ];
+
+          setPets(mockPets);
+          setConsultations(mockConsultations);
+          setExamResults(mockExamResults);
         } catch (error) {
           console.error('Error parsing saved client data:', error);
           // Clear corrupted session

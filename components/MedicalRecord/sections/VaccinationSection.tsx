@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Syringe,
@@ -357,35 +358,29 @@ export function VaccinationSection({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="space-y-3">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-yellow-800">
-                  <p className="font-medium mb-1">Importante:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Vacinas são essenciais para prevenir doenças graves</li>
-                    <li>Respeite o intervalo entre doses para garantir imunidade adequada</li>
-                    <li>Alguns estabelecimentos exigem carteira de vacinação atualizada</li>
-                    <li>Consulte um veterinário para estabelecer um cronograma personalizado</li>
-                  </ul>
-                </div>
+            <Alert variant="warning">
+              <div>
+                <p className="font-medium mb-1">Importante:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Vacinas são essenciais para prevenir doenças graves</li>
+                  <li>Respeite o intervalo entre doses para garantir imunidade adequada</li>
+                  <li>Alguns estabelecimentos exigem carteira de vacinação atualizada</li>
+                  <li>Consulte um veterinário para estabelecer um cronograma personalizado</li>
+                </ul>
               </div>
-            </div>
+            </Alert>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Recomendações:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Mantenha sempre um registro atualizado das vacinas</li>
-                    <li>Observe o animal por 24 horas após a vacinação</li>
-                    <li>Comunique qualquer reação adversa ao veterinário</li>
-                    <li>Não vacine animais doentes ou imunodeprimidos sem avaliação veterinária</li>
-                  </ul>
-                </div>
+            <Alert variant="info">
+              <div>
+                <p className="font-medium mb-1">Recomendações:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Mantenha sempre um registro atualizado das vacinas</li>
+                  <li>Observe o animal por 24 horas após a vacinação</li>
+                  <li>Comunique qualquer reação adversa ao veterinário</li>
+                  <li>Não vacine animais doentes ou imunodeprimidos sem avaliação veterinária</li>
+                </ul>
               </div>
-            </div>
+            </Alert>
           </div>
         </CardContent>
       </Card>

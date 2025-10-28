@@ -25,6 +25,7 @@ export interface TimeSlot {
       id: string;
       name: string;
     };
+    duration_minutes?: number;
   };
 }
 

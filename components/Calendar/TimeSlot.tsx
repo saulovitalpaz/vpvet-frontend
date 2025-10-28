@@ -68,10 +68,15 @@ export function TimeSlot({ slot, onClick }: TimeSlotProps) {
         {/* Status Indicator */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <span className={cn(
-            "text-xs sm:text-sm font-medium hidden sm:inline",
-            slot.available ? "text-primary-700 group-hover:opacity-0 transition-opacity" : "text-red-600"
+            "text-xs sm:text-sm font-medium hidden sm:inline transition-colors",
+            slot.available ? "text-primary-700 group-hover:text-primary-600" : "text-red-600"
           )}>
-            {slot.available ? "Disponível" : "Ocupado"}
+            {slot.available ? (
+              <span className="group-hover:hidden">Disponível</span>
+            ) : "Ocupado"}
+            {slot.available && (
+              <span className="hidden group-hover:inline">Agendar</span>
+            )}
           </span>
           <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0"
                style={{ backgroundColor: slot.available ? 'var(--primary)' : 'var(--danger)' }}>
@@ -79,15 +84,7 @@ export function TimeSlot({ slot, onClick }: TimeSlotProps) {
         </div>
       </div>
 
-      {/* Hover Action Indicator (Available slots only) */}
-      {slot.available && (
-        <div className="absolute top-1/2 right-3 sm:right-4 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          <div className="text-xs sm:text-sm font-medium text-primary-600 flex items-center gap-1">
-            <span className="hidden sm:inline">Agendar</span>
-            <span className="text-sm sm:text-lg">→</span>
-          </div>
-        </div>
-      )}
+
 
       {/* Appointment Details for Occupied Slots */}
       {!slot.available && canSeeDetails && slot.appointment && (

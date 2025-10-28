@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
 import {
   FileText,
   CheckCircle,
@@ -71,12 +72,14 @@ export function DiagnosisSection({
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Importante:</strong> Registre os diagnósticos diferenciais considerados,
-              o diagnóstico provisório inicial e, quando confirmado, o diagnóstico definitivo.
-            </p>
-          </div>
+          <Alert variant="info">
+            <div>
+              <p className="text-sm">
+                <strong>Importante:</strong> Registre os diagnósticos diferenciais considerados,
+                o diagnóstico provisório inicial e, quando confirmado, o diagnóstico definitivo.
+              </p>
+            </div>
+          </Alert>
         </CardContent>
       </Card>
 

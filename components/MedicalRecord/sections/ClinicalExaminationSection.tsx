@@ -3,7 +3,8 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Alert } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Stethoscope,
   Heart,
@@ -135,12 +136,14 @@ export function ClinicalExaminationSection({
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              <strong>Nota:</strong> Registre os achados do exame físico sistemático para cada sistema orgânico.
-              Inclua achados normais e anormais, com descrições detalhadas quando necessário.
-            </p>
-          </div>
+          <Alert variant="info" className="mb-6">
+            <div>
+              <p className="text-sm">
+                <strong>Nota:</strong> Registre os achados do exame físico sistemático para cada sistema orgânico.
+                Inclua achados normais e anormais, com descrições detalhadas quando necessário.
+              </p>
+            </div>
+          </Alert>
         </CardContent>
       </Card>
 
@@ -218,17 +221,17 @@ export function ClinicalExaminationSection({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">Condição Geral</Label>
               {isEditing ? (
-                <Select
-                  value={data.general_condition || ''}
-                  onChange={(e) => onChange('general_condition', e.target.value)}
-                  className="text-sm"
-                >
-                  <option value="">Selecione...</option>
-                  <option value="excellent">Excelente</option>
-                  <option value="good">Bom</option>
-                  <option value="fair">Regular</option>
-                  <option value="poor">Ruim</option>
-                  <option value="critical">Crítico</option>
+                <Select value={data.general_condition || ''} onValueChange={(value) => onChange('general_condition', value)}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="excellent">Excelente</SelectItem>
+                    <SelectItem value="good">Bom</SelectItem>
+                    <SelectItem value="fair">Regular</SelectItem>
+                    <SelectItem value="poor">Ruim</SelectItem>
+                    <SelectItem value="critical">Crítico</SelectItem>
+                  </SelectContent>
                 </Select>
               ) : (
                 <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
@@ -241,17 +244,17 @@ export function ClinicalExaminationSection({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">Avaliação de Dor</Label>
               {isEditing ? (
-                <Select
-                  value={data.pain_assessment || ''}
-                  onChange={(e) => onChange('pain_assessment', e.target.value)}
-                  className="text-sm"
-                >
-                  <option value="">Selecione...</option>
-                  <option value="none">Ausente</option>
-                  <option value="mild">Leve</option>
-                  <option value="moderate">Moderada</option>
-                  <option value="severe">Severa</option>
-                  <option value="extreme">Extrema</option>
+                <Select value={data.pain_assessment || ''} onValueChange={(value) => onChange('pain_assessment', value)}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Ausente</SelectItem>
+                    <SelectItem value="mild">Leve</SelectItem>
+                    <SelectItem value="moderate">Moderada</SelectItem>
+                    <SelectItem value="severe">Severa</SelectItem>
+                    <SelectItem value="extreme">Extrema</SelectItem>
+                  </SelectContent>
                 </Select>
               ) : (
                 <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">
@@ -264,17 +267,17 @@ export function ClinicalExaminationSection({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700">Status de Emergência</Label>
               {isEditing ? (
-                <Select
-                  value={data.emergency_status || ''}
-                  onChange={(e) => onChange('emergency_status', e.target.value)}
-                  className="text-sm"
-                >
-                  <option value="">Selecione...</option>
-                  <option value="stable">Estável</option>
-                  <option value="critical">Crítico mas estável</option>
-                  <option value="unstable">Instável</option>
-                  <option value="emergency">Emergência</option>
-                  <option value="critical_emergency">Emergência crítica</option>
+                <Select value={data.emergency_status || ''} onValueChange={(value) => onChange('emergency_status', value)}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stable">Estável</SelectItem>
+                    <SelectItem value="critical">Crítico mas estável</SelectItem>
+                    <SelectItem value="unstable">Instável</SelectItem>
+                    <SelectItem value="emergency">Emergência</SelectItem>
+                    <SelectItem value="critical_emergency">Emergência crítica</SelectItem>
+                  </SelectContent>
                 </Select>
               ) : (
                 <div className="px-3 py-2 bg-gray-50 rounded-md text-sm">

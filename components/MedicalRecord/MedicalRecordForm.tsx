@@ -14,16 +14,17 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Import section components
-import { PatientInfoSection } from './sections/PatientInfoSection';
-import { ClinicalExaminationSection } from './sections/ClinicalExaminationSection';
-import { ChiefComplaintSection } from './sections/ChiefComplaintSection';
-import { DiagnosticTestsSection } from './sections/DiagnosticTestsSection';
-import { DiagnosisSection } from './sections/DiagnosisSection';
-import { TreatmentPlanSection } from './sections/TreatmentPlanSection';
-import { VaccinationSection } from './sections/VaccinationSection';
-import { FollowUpSection } from './sections/FollowUpSection';
+import { PatientInfoSection } from '@/components/MedicalRecord/sections/PatientInfoSection';
+import { ClinicalExaminationSection } from '@/components/MedicalRecord/sections/ClinicalExaminationSection';
+import { ChiefComplaintSection } from '@/components/MedicalRecord/sections/ChiefComplaintSection';
+import { DiagnosticTestsSection } from '@/components/MedicalRecord/sections/DiagnosticTestsSection';
+import { DiagnosisSection } from '@/components/MedicalRecord/sections/DiagnosisSection';
+import { TreatmentPlanSection } from '@/components/MedicalRecord/sections/TreatmentPlanSection';
+import { VaccinationSection } from '@/components/MedicalRecord/sections/VaccinationSection';
+import { FollowUpSection } from '@/components/MedicalRecord/sections/FollowUpSection';
 
 import {
   Form,
@@ -50,7 +51,7 @@ import {
   Thermometer,
   Weight,
   Wind,
-  TachometerAlt
+  Gauge
 } from 'lucide-react';
 
 // Validation schema
@@ -282,7 +283,8 @@ export function MedicalRecordForm({
   ];
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary>
+      <div className="space-y-6">
       {/* Tab Navigation */}
       <div className="bg-white rounded-lg border border-gray-200 p-1">
         <div className="flex flex-wrap gap-1">
@@ -310,8 +312,7 @@ export function MedicalRecordForm({
       </div>
 
       {/* Form Content */}
-      <Form>
-        <div className="space-y-6">
+      <div className="space-y-6">
           {/* Patient Information Section */}
           {activeTab === 'patient-info' && (
             <PatientInfoSection
@@ -396,7 +397,6 @@ export function MedicalRecordForm({
             />
           )}
         </div>
-      </Form>
 
       {/* Save Button (Fixed at bottom when editing) */}
       {isEditing && (
@@ -423,5 +423,6 @@ export function MedicalRecordForm({
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }

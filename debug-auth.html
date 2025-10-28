@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Debug</title>
+</head>
+<body>
+    <h1>Authentication Debug</h1>
+    <div id="output"></div>
+
+    <script>
+        // Check localStorage for token
+        const token = localStorage.getItem('token');
+        console.log('Token in localStorage:', token);
+
+        // Fetch user profile
+        if (token) {
+            fetch('http://localhost:5000/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('User data from API:', data);
+                document.getElementById('output').innerHTML = `
+                    <h2>User Profile Data:</h2>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <h3>is_dr_saulo value:</h3>
+                    <p>${data.user?.is_dr_saulo} (type: ${typeof data.user?.is_dr_saulo})</p>
+                `;
+            })
+            .catch(error => {
+                console.error('Error fetching user:', error);
+                document.getElementById('output').innerHTML = `<p>Error: ${error.message}</p>`;
+            });
+        } else {
+            document.getElementById('output').innerHTML = '<p>No token found in localStorage</p>';
+        }
+    </script>
+</body>
+</html>

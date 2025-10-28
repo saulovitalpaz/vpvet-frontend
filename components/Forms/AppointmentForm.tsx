@@ -10,15 +10,16 @@ import { TimeSlot } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { PatientSearchSelect } from '../Patients/PatientSearchSelect';
+import { PatientSearchSelect } from '@/components/Patients/PatientSearchSelect';
 
 const appointmentSchema = z.object({
   animal_id: z.string().min(1, 'Selecione um paciente'),
   datetime: z.string(),
   service_type: z.string().min(1, 'Selecione o tipo de exame'),
+  duration: z.string().min(1, 'Selecione a duração'),
   notes: z.string().optional(),
 });
 
@@ -39,15 +40,17 @@ export function AppointmentForm({ selectedSlot, onSuccess, onCancel }: Appointme
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
       datetime: selectedSlot.datetime,
+      duration: '30', // Default 30 minutes
     },
   });
 
   const mutation = useMutation({
-    mutationFn: (data: AppointmentFormData) => api.post('/appointments', data),
+    mutationFn: (submitData: any) => api.post('/appointments', submitData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       onSuccess();
@@ -55,7 +58,12 @@ export function AppointmentForm({ selectedSlot, onSuccess, onCancel }: Appointme
   });
 
   const onSubmit = (data: AppointmentFormData) => {
-    mutation.mutate(data);
+    const submitData = {
+      ...data,
+      duration_minutes: parseInt(data.duration),
+      duration: undefined, // Remove the string duration field
+    };
+    mutation.mutate(submitData);
   };
 
   const handlePatientSelect = (patientId: string) => {
@@ -79,17 +87,39 @@ export function AppointmentForm({ selectedSlot, onSuccess, onCancel }: Appointme
 
       <div className="space-y-2">
         <Label htmlFor="service_type">Tipo de Exame *</Label>
-        <Select id="service_type" {...register('service_type')}>
-          <option value="">Selecione...</option>
-          <option value="Ultrassom Abdominal">Ultrassom Abdominal</option>
-          <option value="Ultrassom Obstétrico">Ultrassom Obstétrico</option>
-          <option value="Ecocardiograma">Ecocardiograma</option>
-          <option value="Raio-X Torácico">Raio-X Torácico</option>
-          <option value="Raio-X Abdominal">Raio-X Abdominal</option>
-          <option value="Raio-X Ortopédico">Raio-X Ortopédico</option>
-          <option value="Tomografia">Tomografia</option>
+        <Select value={watch('service_type')} onValueChange={(value) => setValue('service_type', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Ultrassom Abdominal">Ultrassom Abdominal</SelectItem>
+            <SelectItem value="Ultrassom Obstétrico">Ultrassom Obstétrico</SelectItem>
+            <SelectItem value="Ecocardiograma">Ecocardiograma</SelectItem>
+            <SelectItem value="Raio-X Torácico">Raio-X Torácico</SelectItem>
+            <SelectItem value="Raio-X Abdominal">Raio-X Abdominal</SelectItem>
+            <SelectItem value="Raio-X Ortopédico">Raio-X Ortopédico</SelectItem>
+            <SelectItem value="Tomografia">Tomografia</SelectItem>
+          </SelectContent>
         </Select>
         {errors.service_type && <p className="text-sm text-red-600">{errors.service_type.message}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="duration">Duração *</Label>
+        <Select value={watch('duration')} onValueChange={(value) => setValue('duration', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="30">30 minutos</SelectItem>
+            <SelectItem value="60">1 hora</SelectItem>
+            <SelectItem value="90">1 hora e 30 minutos</SelectItem>
+            <SelectItem value="120">2 horas</SelectItem>
+            <SelectItem value="150">2 horas e 30 minutos</SelectItem>
+            <SelectItem value="180">3 horas</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.duration && <p className="text-sm text-red-600">{errors.duration.message}</p>}
       </div>
 
       <div className="space-y-2">
@@ -98,7 +128,7 @@ export function AppointmentForm({ selectedSlot, onSuccess, onCancel }: Appointme
       </div>
 
       {mutation.isError && (
-        <Alert variant="destructive">
+        <Alert variant="error">
           <AlertDescription>
             {(mutation.error as any)?.response?.status === 409
               ? `Horário já ocupado. ${

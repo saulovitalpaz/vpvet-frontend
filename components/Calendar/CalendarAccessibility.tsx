@@ -69,6 +69,8 @@ export function CalendarAccessibility({
         case '3':
         case '4':
         case '5':
+        case '6':
+        case '7':
           e.preventDefault();
           const dayIndex = parseInt(e.key) - 1;
           if (dayIndex < weekDays.length) {
@@ -89,7 +91,7 @@ export function CalendarAccessibility({
       <div id="calendar-announcement" />
       <div>
         Navegação por teclado disponível: Setas esquerda/direita para mudar dias,
-        Home para primeiro dia, End para último dia, números 1-5 para selecionar dias específicos.
+        Home para primeiro dia, End para último dia, números 1-7 para selecionar dias específicos.
       </div>
     </div>
   );

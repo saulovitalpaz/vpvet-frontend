@@ -10,7 +10,7 @@ import {
   Heart,
   Wind,
   Weight,
-  TachometerAlt,
+  Gauge,
   Activity,
   User,
   Dog,
@@ -159,7 +159,7 @@ export function PatientInfoSection({
             {/* Blood Pressure */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <TachometerAlt className="w-4 h-4 text-indigo-500" />
+                <Gauge className="w-4 h-4 text-indigo-500" />
                 Pressão Arterial
               </Label>
               {isEditing ? (

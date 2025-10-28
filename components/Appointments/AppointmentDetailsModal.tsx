@@ -65,11 +65,11 @@ export function AppointmentDetailsModal({ appointmentId, isOpen, onClose, onDele
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-primary-600" />
+      <DialogContent className="sm:max-w-[600px] bg-white border border-gray-200/60 shadow-sm">
+        <DialogHeader className="border-b border-gray-100 pb-4">
+          <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-3">
+            <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-gray-600" />
             </div>
             Detalhes do Agendamento
           </DialogTitle>
@@ -77,7 +77,7 @@ export function AppointmentDetailsModal({ appointmentId, isOpen, onClose, onDele
 
         {showDeleteConfirm ? (
           <div className="space-y-4">
-            <Alert variant="destructive">
+            <Alert variant="error">
               <AlertTriangle className="h-5 w-5" />
               <AlertDescription className="ml-2">
                 Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.
@@ -99,22 +99,22 @@ export function AppointmentDetailsModal({ appointmentId, isOpen, onClose, onDele
           </div>
         ) : (
           <>
-            <div className="space-y-4">
+            <div className="px-6 py-4 space-y-4">
               {/* Date and Time */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-600 mb-2">
                     <Calendar className="w-4 h-4" />
-                    <span className="text-sm font-medium">Data</span>
+                    <span className="text-xs font-medium uppercase tracking-wide">Data</span>
                   </div>
                   <p className="text-base font-semibold text-gray-900">
                     {format(appointmentDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-600 mb-2">
                     <Clock className="w-4 h-4" />
-                    <span className="text-sm font-medium">Horário</span>
+                    <span className="text-xs font-medium uppercase tracking-wide">Horário</span>
                   </div>
                   <p className="text-base font-semibold text-gray-900">
                     {format(appointmentDate, 'HH:mm')}
@@ -124,53 +124,77 @@ export function AppointmentDetailsModal({ appointmentId, isOpen, onClose, onDele
 
               {/* Patient Info */}
               {data.animal && (
-                <div className="space-y-2 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-600 mb-3">
                     <User className="w-4 h-4" />
-                    <span className="text-sm font-medium">Paciente</span>
+                    <span className="text-xs font-medium uppercase tracking-wide">Paciente</span>
                   </div>
-                  <p className="text-base font-semibold text-gray-900">{data.animal.name}</p>
+                  <p className="text-lg font-semibold text-gray-900 mb-2">{data.animal.name}</p>
                   <div className="text-sm text-gray-600 space-y-1">
-                    <p>
-                      <span className="font-medium">Espécie:</span> {data.animal.species}
-                      {data.animal.breed && ` - ${data.animal.breed}`}
-                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium">Espécie:</span>
+                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{data.animal.species}</span>
+                      {data.animal.breed && <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{data.animal.breed}</span>}
+                    </div>
                     {data.animal.tutor && (
-                      <p>
-                        <span className="font-medium">Tutor:</span> {data.animal.tutor.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Tutor:</span>
+                        <span className="text-gray-700">{data.animal.tutor.name}</span>
+                      </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Service Type */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <FileText className="w-4 h-4" />
-                  <span className="text-sm font-medium">Tipo de Exame</span>
+              {/* Service Type and Duration */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-600 mb-2">
+                    <FileText className="w-4 h-4" />
+                    <span className="text-xs font-medium uppercase tracking-wide">Tipo de Exame</span>
+                  </div>
+                  <p className="text-base font-semibold text-gray-900">{data.service_type}</p>
                 </div>
-                <p className="text-base font-semibold text-gray-900">{data.service_type}</p>
+                {data.duration_minutes && (
+                  <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-gray-600 mb-2">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Duração</span>
+                    </div>
+                    <p className="text-base font-semibold text-gray-900">
+                      {data.duration_minutes === 30 ? '30 minutos' :
+                       data.duration_minutes === 60 ? '1 hora' :
+                       data.duration_minutes === 90 ? '1 hora e 30 minutos' :
+                       data.duration_minutes === 120 ? '2 horas' :
+                       data.duration_minutes === 150 ? '2 horas e 30 minutos' :
+                       data.duration_minutes === 180 ? '3 horas' :
+                       `${data.duration_minutes} minutos`}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Notes */}
               {data.notes && (
-                <div className="space-y-2">
-                  <span className="text-sm font-medium text-gray-600">Observações</span>
-                  <p className="text-sm text-gray-900 p-3 bg-gray-50 rounded-lg">{data.notes}</p>
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-600 mb-2">
+                    <FileText className="w-4 h-4" />
+                    <span className="text-xs font-medium uppercase tracking-wide">Observações</span>
+                  </div>
+                  <p className="text-gray-900 text-sm bg-gray-50 rounded p-3 border border-gray-100">{data.notes}</p>
                 </div>
               )}
 
               {/* Clinic */}
               {data.clinic && (
-                <div className="space-y-2">
-                  <span className="text-sm font-medium text-gray-600">Clínica</span>
-                  <p className="text-sm text-gray-900">{data.clinic.name}</p>
+                <div className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <span className="text-xs font-medium uppercase tracking-wide text-gray-600">Clínica</span>
+                  <p className="text-base font-semibold text-gray-900 mt-1">{data.clinic.name}</p>
                 </div>
               )}
 
               {deleteMutation.isError && (
-                <Alert variant="destructive">
+                <Alert variant="error">
                   <AlertDescription>
                     Erro ao excluir agendamento. Tente novamente.
                   </AlertDescription>
@@ -178,10 +202,10 @@ export function AppointmentDetailsModal({ appointmentId, isOpen, onClose, onDele
               )}
             </div>
 
-            <div className="flex gap-2 justify-end pt-4 border-t">
+            <div className="flex gap-3 justify-end pt-4 px-6 pb-6 border-t border-gray-100">
               <Button
                 variant="outline"
-                className="text-red-600 border-red-300 hover:bg-red-50"
+                className="text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <Trash2 className="w-4 h-4 mr-2" />

@@ -3,6 +3,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { environmentDetector } from '@/lib/environment/environmentDetector';
+import {
+  isDebugModeEnabled,
+  isEnhancedErrorReportingEnabled,
+  isAutoEnvironmentSwitchingEnabled
+} from '@/lib/config/featureFlags';
 
 interface User {
   id: string;
@@ -31,6 +37,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    // Log environment information on AuthProvider initialization
+    if (isDebugModeEnabled()) {
+      const envInfo = environmentDetector.getConfig();
+      console.log('[AuthProvider] Initializing with environment:', {
+        environment: envInfo.environment,
+        apiBaseUrl: envInfo.apiBaseUrl,
+        autoSwitchingEnabled: isAutoEnvironmentSwitchingEnabled(),
+        debugModeEnabled: isDebugModeEnabled(),
+        enhancedErrorReporting: isEnhancedErrorReportingEnabled()
+      });
+    }
+
     // Check for existing token on mount
     const token = localStorage.getItem('token');
     if (token) {
@@ -42,9 +60,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
+      if (isDebugModeEnabled()) {
+        console.log('[AuthProvider] Fetching user profile');
+      }
+
       const response = await api.get('/auth/me');
+
+      if (isDebugModeEnabled()) {
+        console.log('[AuthProvider] User profile fetched successfully:', {
+          userId: response.data.user?.id,
+          userName: response.data.user?.name,
+          userRole: response.data.user?.role,
+          environment: environmentDetector.getEnvironment()
+        });
+      }
+
       setUser(response.data.user);
     } catch (error) {
+      if (isEnhancedErrorReportingEnabled()) {
+        console.error('[AuthProvider] Failed to fetch user profile:', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          environment: environmentDetector.getEnvironment(),
+          apiBaseUrl: environmentDetector.getConfig().apiBaseUrl,
+          hasToken: !!localStorage.getItem('token')
+        });
+      }
+
       // Token invalid, remove it
       localStorage.removeItem('token');
       setUser(null);
@@ -54,13 +95,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', response.data.token);
-    setUser(response.data.user);
-    router.push('/dashboard');
+    try {
+      if (isDebugModeEnabled()) {
+        console.log('[AuthProvider] Attempting login:', {
+          email,
+          environment: environmentDetector.getEnvironment(),
+          apiBaseUrl: environmentDetector.getConfig().apiBaseUrl
+        });
+      }
+
+      const response = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
+
+      if (isDebugModeEnabled()) {
+        console.log('[AuthProvider] Login successful:', {
+          userId: response.data.user?.id,
+          userName: response.data.user?.name,
+          userRole: response.data.user?.role,
+          redirectTarget: '/dashboard'
+        });
+      }
+
+      router.push('/dashboard');
+    } catch (error) {
+      if (isEnhancedErrorReportingEnabled()) {
+        console.error('[AuthProvider] Login failed:', {
+          email,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          environment: environmentDetector.getEnvironment(),
+          apiBaseUrl: environmentDetector.getConfig().apiBaseUrl
+        });
+      }
+
+      // Re-throw the error to be handled by the login form
+      throw error;
+    }
   };
 
   const logout = () => {
+    if (isDebugModeEnabled()) {
+      console.log('[AuthProvider] Logging out user:', {
+        userId: user?.id,
+        userName: user?.name,
+        environment: environmentDetector.getEnvironment()
+      });
+    }
+
     localStorage.removeItem('token');
     setUser(null);
     router.push('/');

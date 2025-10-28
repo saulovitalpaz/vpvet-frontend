@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Calendar,
@@ -89,12 +91,14 @@ export function FollowUpSection({
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Importante:</strong> Defina claramente o prognóstico, datas de acompanhamento
-              e instruções específicas para o monitoramento do paciente.
-            </p>
-          </div>
+          <Alert variant="info">
+            <div>
+              <p className="text-sm">
+                <strong>Importante:</strong> Defina claramente o prognóstico, datas de acompanhamento
+                e instruções específicas para o monitoramento do paciente.
+              </p>
+            </div>
+          </Alert>
         </CardContent>
       </Card>
 

@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { TimeSlot as TimeSlotType } from '@/lib/types';
-import { TimeSlot } from './TimeSlot';
-import { DaySelector } from './DaySelector';
+import { TimeSlot } from '@/components/Calendar/TimeSlot';
+import { DaySelector } from '@/components/Calendar/DaySelector';
+import { WeeklyCalendar } from '@/components/Calendar/WeeklyCalendar';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { format, addDays, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 interface CalendarProps {
   onSlotClick: (slot: TimeSlotType) => void;
@@ -38,6 +40,7 @@ function useMediaQuery(query: string): boolean {
 export function Calendar({ onSlotClick }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const hasInitialized = useRef(false);
 
   const isMobile = useMediaQuery('(max-width: 1023px)');
 
@@ -57,26 +60,15 @@ export function Calendar({ onSlotClick }: CalendarProps) {
     },
   });
 
-  // Auto-select today on mobile or when week changes
-  useEffect(() => {
-    if (isMobile) {
-      const todayIndex = weekDays.findIndex(day =>
-        format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-      );
-      if (todayIndex >= 0) {
-        setSelectedDayIndex(todayIndex);
-      }
-    }
-  }, [isMobile, weekStart]);
-
+  
   const previousWeek = () => {
     setCurrentDate((date) => addDays(date, -7));
-    if (isMobile) setSelectedDayIndex(0); // Reset to first day on week change
+    // Don't reset user selection on week change
   };
 
   const nextWeek = () => {
     setCurrentDate((date) => addDays(date, 7));
-    if (isMobile) setSelectedDayIndex(0); // Reset to first day on week change
+    // Don't reset user selection on week change
   };
 
   const today = () => {
@@ -93,10 +85,26 @@ export function Calendar({ onSlotClick }: CalendarProps) {
     slotsByDay[day].push(slot);
   });
 
-  const weekDays = [];
-  for (let i = 0; i < 5; i++) { // Monday to Friday
-    weekDays.push(addDays(weekStart, i));
-  }
+  const weekDays = useMemo(() => {
+    const days: Date[] = [];
+    for (let i = 0; i < 7; i++) { // Monday to Sunday
+      days.push(addDays(weekStart, i));
+    }
+    return days;
+  }, [weekStart]);
+
+  // Auto-select today on mobile initial load only (don't override user selection)
+  useEffect(() => {
+    if (!hasInitialized.current && isMobile) {
+      const todayIndex = weekDays.findIndex(day =>
+        format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
+      );
+      if (todayIndex >= 0) {
+        setSelectedDayIndex(todayIndex);
+        hasInitialized.current = true;
+      }
+    }
+  }, [isMobile, weekDays]);
 
   // Keyboard navigation for mobile
   useEffect(() => {
@@ -142,12 +150,35 @@ export function Calendar({ onSlotClick }: CalendarProps) {
   // Mobile view - Single day with selector
   if (isMobile) {
     const selectedDay = weekDays[selectedDayIndex];
-    const dayKey = format(selectedDay, 'yyyy-MM-dd');
-    const daySlots = slotsByDay[dayKey] || [];
-    const isToday = format(selectedDay, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+
+    // Create consistent date keys using local timezone
+    const normalizeDateKey = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const dayKey = normalizeDateKey(selectedDay);
+
+    // Enhanced slot filtering with better error handling
+    let daySlots: TimeSlotType[] = [];
+
+    if (slotsByDay[dayKey]) {
+      daySlots = slotsByDay[dayKey];
+    } else {
+      // Try to find slots by checking each slot's date
+      daySlots = (data?.slots || []).filter((slot: TimeSlotType) => {
+        const slotDate = new Date(slot.datetime);
+        return !isNaN(slotDate.getTime()) && normalizeDateKey(slotDate) === dayKey;
+      });
+    }
+
+    const isToday = normalizeDateKey(selectedDay) === normalizeDateKey(new Date());
 
     return (
-      <div className="space-y-4">
+      <ErrorBoundary>
+        <div className="space-y-4">
         {/* Calendar Header */}
         <Card className="shadow-sm border border-gray-200 bg-white">
           <CardHeader className="bg-gradient-to-r from-gray-50 via-white to-gray-50/50 border-b border-gray-100 px-3 sm:px-6 py-3 sm:py-6">
@@ -243,12 +274,14 @@ export function Calendar({ onSlotClick }: CalendarProps) {
           </CardContent>
         </Card>
       </div>
+      </ErrorBoundary>
     );
   }
 
   // Desktop view - Original grid layout
   return (
-    <div className="space-y-6">
+    <ErrorBoundary>
+      <div className="space-y-6">
       {/* Calendar Header */}
       <Card className="shadow-sm border border-gray-200 bg-white">
         <CardHeader className="bg-gradient-to-r from-gray-50 via-white to-gray-50/50 border-b border-gray-100">
@@ -291,60 +324,13 @@ export function Calendar({ onSlotClick }: CalendarProps) {
         </CardHeader>
       </Card>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {weekDays.map((day) => {
-          const dayKey = format(day, 'yyyy-MM-dd');
-          const daySlots = slotsByDay[dayKey] || [];
-          const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-
-          return (
-            <Card
-              key={dayKey}
-              className={cn(
-                "shadow-sm transition-all duration-200 border border-gray-200 hover:border-gray-300 hover:shadow-md"
-              )}
-            >
-              <CardHeader className="pb-4 bg-gradient-to-b from-gray-50/80 to-white border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-sm font-semibold uppercase tracking-wide text-gray-600">
-                      {format(day, 'EEEE', { locale: ptBR })}
-                    </CardTitle>
-                    <div className="text-lg font-bold text-gray-900 mt-1">
-                      {format(day, 'dd/MM')}
-                    </div>
-                  </div>
-                  {isToday && (
-                    <div className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                      Hoje
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="p-3 space-y-2 custom-scrollbar max-h-[600px] overflow-y-auto bg-gray-50/20">
-                {daySlots.length > 0 ? (
-                  daySlots.map((slot) => (
-                    <TimeSlot
-                      key={slot.datetime}
-                      slot={slot}
-                      onClick={() => onSlotClick(slot)}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <CalendarIcon className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">Sem horários</p>
-                    <p className="text-xs text-gray-400 mt-1">Volte mais tarde</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {/* Weekly Calendar Grid */}
+      <WeeklyCalendar
+        slotsByDay={slotsByDay}
+        weekDays={weekDays}
+        onSlotClick={onSlotClick}
+      />
     </div>
+    </ErrorBoundary>
   );
 }
